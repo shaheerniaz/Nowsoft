@@ -9,6 +9,10 @@ using MediatR;
 using NowSoft.Infrastructure.Data;
 using NowSoft.Infrastructure.Interfaces;
 using NowSoft.Infrastructure.Services;
+using NowSoft.Application;
+using System.Reflection;
+using NowSoft.Application.Commands.Authnticate;
+using NowSoft.Application.Commands.Signup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,11 +21,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register MediatR
-builder.Services.AddMediatR(typeof(Program).Assembly); // Registering MediatR from Application layer
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(SignupCommandHandler).Assembly)); // Registering MediatR from Application layer
 
 // Register JwtTokenGenerator and other services
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(); // Make sure to match the interface and implementation
-
+var key = builder.Configuration["Jwt:Key"];
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -37,6 +42,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
+builder.Services.AddSwaggerGen();
+
+// Enable middleware in Configure
+
 
 // Add MVC controllers
 builder.Services.AddControllers();
@@ -49,7 +58,12 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
+    c.RoutePrefix = string.Empty; // to make Swagger UI available at root "/"
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

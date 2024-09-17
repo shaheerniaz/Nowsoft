@@ -17,5 +17,11 @@ namespace NowSoft.Infrastructure.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<LoginAttempt> LoginAttempts { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .Property(u => u.Balance).HasPrecision(18,2); // or .HasPrecision(18, 2)
+        }
     }
+
 }

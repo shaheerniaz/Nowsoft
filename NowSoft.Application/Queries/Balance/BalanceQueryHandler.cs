@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace NowSoft.Application.Queries.Balance
 {
-    public class GetBalanceQueryHandler : IRequestHandler<BalanceQuery, BalanceResponse>
+    public class BalanceQueryHandler : IRequestHandler<BalanceQuery, BalanceResponse>
     {
         private readonly ApplicationDbContext _context;
 
-        public GetBalanceQueryHandler(ApplicationDbContext context)
+        public BalanceQueryHandler(ApplicationDbContext context)
         {
             _context = context;
         }

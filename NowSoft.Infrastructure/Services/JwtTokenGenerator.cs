@@ -26,7 +26,7 @@ namespace NowSoft.Infrastructure.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("Name", user.Username),
             }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -38,9 +38,9 @@ namespace NowSoft.Infrastructure.Services
         public string GetUsernameFromToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
             var principal = tokenHandler.ReadToken(token) as JwtSecurityToken;
-            return principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            return principal?.Claims.FirstOrDefault(c => c.Type == "Name")?.Value;
         }
     }
 }
